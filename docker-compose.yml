@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+  app:
+    container_name: app
+    image: juniawan/simple-codeigniter:1.0.0
+    working_dir: /var/www/html/
+    volumes:
+      - .:/var/www/html/
+    ports:
+      - 8080:80
+    command: bash -c "composer update && /usr/sbin/apache2ctl -DFOREGROUND"
+    networks:
+      - app-network
+    depends_on:
+      - app-mysql
+  app-mysql:
+    container_name: app_mysql
+    image: 'mysql/mysql-server:8.0'
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: 'password'
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_DATABASE: 'app'
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: 'password'
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+    volumes:
+      - 'app-mysql:/var/lib/mysql'
+    networks:
+      - app-network
+networks:
+  app-network:
+    driver: bridge
+volumes:
+  app-mysql:
+    driver: local
